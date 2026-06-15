@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soporte Técnico - Sistema de Preselección de Cursos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <!-- Fondo Parallax -->
+    <div class="parallax-bg"></div>
+    <div class="overlay"></div>
+
+    <!-- Header Fijo -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Preselección de Cursos</h1>
+                    <p>Sistema de Planificación Académica</p>
+                </div>
+            </div>
+            <div class="header-badge">
+                <i class="fas fa-calendar-alt"></i> Periodo de Verano 2026-3
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="maintenance-container">
+            <div class="maintenance-card">
+                <div class="card-body">
+                    <div class="icon-container">
+                        <div class="icon-circle">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                    </div>
+                    
+                    <h1 class="maintenance-title">Soporte Técnico</h1>
+                    <div class="badge">
+                        <i class="fas fa-clock"></i> Disponible 24/7
+                    </div>
+                    
+                    <div class="message">
+                        <p>¿Necesitas ayuda? Contáctanos a través de cualquiera de los siguientes medios:</p>
+                    </div>
+                    
+                    <div class="feature-status">
+                        <h4><i class="fas fa-phone-alt"></i> Canales de atención</h4>
+                        <ul class="status-list">
+                            <li>
+                                <a href="tel:+584242704255">
+                                    <i class="fas fa-phone"></i>
+                                    <span>📞 Llamar al soporte técnico</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="mailto:soporte@informatica.com">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>✉️ Enviar correo electrónico</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://wa.me/584242704255" target="_blank">
+                                    <i class="fab fa-whatsapp"></i>
+                                    <span>💬 Contactar por WhatsApp</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://maps.google.com/?q=Universidad+Nacional+Experimental+de+los+Llanos+Rómulo+Gallegos+San+Juan+de+los+Morros" target="_blank">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>📍 Direccion de la Agencia</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="soporte-info">
+                        <p><i class="fas fa-clock"></i> Horario de atención: Lunes a Viernes de 8:00 AM a 5:00 PM</p>
+                        <p><i class="fas fa-tty"></i> Tiempo de respuesta estimado: 24 horas hábiles</p>
+                    </div>
+                    
+                    <button class="btn-back" onclick="volverAtras()">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Transparente -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Sistema de Preselección</h4>
+                    <p>Plataforma diseñada para facilitar la preselección de cursos del periodo de verano, optimizando la planificación académica.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul>
+                        <li><a href="terminos.html">📋 Términos y Condiciones</a></li>
+                        <li><a href="soporte.html">📞 Soporte Técnico</a></li>
+                        <li><a href="mailto:soporte@informatica.com">✉️ Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> soporte@informatica.com</li>
+                        <li><i class="fas fa-phone"></i> +58 424-2704255</li>
+                        <li><i class="fab fa-whatsapp"></i> 0424-2704255</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Ubicación</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i>San Juan de los Morros, Guárico</li>
+                        <li><i class="far fa-clock"></i> Lun - Vie: 8am - 5pm</li>
+                        <li><i class="far fa-clock"></i> Sábados: 8am - 12pm</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Sistema de Preselección de Cursos - Periodo de Verano</p>
+                <p>Desarrollado por <strong>Juliexis & Gabrie</strong></p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        function volverAtras() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
