@@ -1,0 +1,197 @@
+-------------------------------------------------------------------------------------
+                Identificadores de Materia
+-------------------------------------------------------------------------------------
+Código	   | Nombre de la Materia	                  | U.C	    |    Semestre       
+-----------|------------------------------------------|---------|--------------------
+IC1222	    Fundamentos de la Informática	                3           1
+DP0001	    Deporte	                                        2           1
+IM1421	    Matemática I	                                5           1
+IM1223	    Lógica Matemática	                            3           1
+FC0001	    Formación Constitucional	                    2           1   
+IH1124	    Lenguaje y Comunicación	                        2           1
+IH1125	    Inglés I	                                    2           1
+EC005	    Economía Digital	                            2           1
+---------------------------------------------------------------------------------
+IM2421	    Matemática II	                                5           2
+IH2124	    Problemática Científica Tecnológica	            2           2
+IB2322	    Física I	                                    4           2
+IME320	    Electiva I (Conducta Humana)	                2           2
+IC2323	    Algoritmos I	                                3           2
+AC0001	    Arte y Cultura	                                2           2
+IH2125	    Inglés II	                                    2           2
+---------------------------------------------------------------------------------
+IC3323	    Algoritmos II	                                3           3
+IME520	    Electiva II (Legislación Informática)	        2           3
+IC3244	    Programación I	                                4           3
+IM3421	    Matemática III	                                5           3
+IB3322	    Física II	                                    4           3
+IH3125	    Metodología y Técnicas de Investigación	        2           3
+---------------------------------------------------------------------------------
+IM5421	    Probabilidades y Estadística	                3           4   
+IM4421	    Matemática IV	                                5           4
+IC4244	    Programación II	                                4           4
+IME720	    Electiva III (Mantenimiento del Computador)	    2           4
+IM4323	    Estructuras Discretas I	                        4           4
+IS4225	    Base de Datos	                                3           4
+---------------------------------------------------------------------------------
+IS5205	    Teoría de Sistemas	                            2           5
+IM5221	    Álgebra Booleana	                            3           5
+IM5323	    Estructuras Discretas II	                    4           5
+IC5244	    Programación III	                            4           5
+IMEIV	    Electiva IV (Teleinformática)	                2           5
+IC5422	    Organización del Computador	                    5           5
+---------------------------------------------------------------------------------
+ID6241	    Investigación de Operaciones	                4           6
+IC6322	    Arquitectura del Computador	                    4           6
+IS6425	    Sistemas de Información I	                    5           6
+IM6243	    Métodos Numéricos	                            4           6
+ID6124	    Ingeniería Económica	                        2           6
+IMEV	    Electiva V	                                    2           6
+---------------------------------------------------------------------------------
+ID7323	    Organización y Gestión Empresa	                4           7
+IS7244	    Traductores e Intérpretes	                    4           7
+IC7322	    Sistemas Operativos	                            4           7
+IS7324	    Sistemas de Información II	                    5           7
+ID7322	    Control de Proyectos	                        4           7
+---------------------------------------------------------------------------------
+EA	        Electiva de Área I	                            4           8
+ID8082	    Pasantía	                                    4           8
+IS8243	    Lenguaje de Programación	                    4           8   
+IS8424	    Sistemas de Información III	                    5           8   
+IT8241	    Redes	                                        4           8
+---------------------------------------------------------------------------------
+EL9325	    Electiva Libre I	                            3           9
+IT9241	    Sistemas Distribuidos	                        4           9
+EA9244	    Electiva de Área II	                            4           9   
+IH9202	    Ética Profesional	                            2           9
+PG9083	    Proyecto de Grado I	                            4           9
+---------------------------------------------------------------------------------
+EA0244	    Electiva de Área III	                        4           10
+EL	        Electiva Libre II	                            3           10
+PG0083	    Proyecto de Grado II	                        4           10
+ISO222	    Informática Educativa	                        3           10
+ID0221	    Gerencia de Proyecto	                        3           10
+---------------------------------------------------------------------------------
+
+Descricon de modulos a crear 
+---------------------------------------------------------------------------------
+preseleccion-cursos/                                      # 📦 Raíz del proyecto
+│
+├── index.html                                            # 🏠 Página principal - Dashboard con resumen y accesos rápidos
+│
+├── pages/                                                # 📄 Carpeta de todas las páginas del sistema
+│   ├── preseleccion.html                                 # 📝 Módulo 1: Interfaz donde los estudiantes seleccionan máximo 2 materias
+│   ├── materias.html                                     # 📚 Módulo 2: CRUD completo para administrar el catálogo de materias
+│   ├── estudiantes.html                                  # 👨‍🎓 Módulo 3: Gestión de estudiantes (registro, edición, eliminación)
+│   ├── reportes.html                                     # 📊 Módulo 4: Estadísticas y reportes de preselecciones por periodo
+│   ├── secciones.html                                    # 📅 Módulo 5: Planificación de aulas y secciones según demanda
+│   └── configuracion.html                                # ⚙️ Módulo 6: Configuración del sistema (periodos, límites, capacidad)
+│
+├── css/                                                  # 🎨 Hojas de estilo para toda la interfaz
+│   ├── main.css                                          # 🌍 Estilos globales (reset, variables, navbar, footer, layout)
+│   ├── preseleccion.css                                  # 🎯 Estilos específicos para el módulo de preselección (tarjetas, grid)
+│   ├── materias.css                                      # 📋 Estilos para gestión de materias (tablas, formularios, búsqueda)
+│   ├── estudiantes.css                                   # 👥 Estilos para gestión de estudiantes (tarjetas, lista, edición)
+│   └── reportes.css                                      # 📈 Estilos para reportes (gráficos, tablas, botones de exportación)
+│
+├── js/                                                   # 🧠 Lógica JavaScript del frontend
+│   ├── main.js                                           # 🔧 Funciones globales (API_URL, navegación, utilidades)
+│   ├── preseleccion.js                                   # ✨ Lógica de preselección (seleccionar, guardar, eliminar materias)
+│   ├── materias.js                                       # 🔄 CRUD de materias (listar, agregar, editar, eliminar, buscar)
+│   ├── estudiantes.js                                    # 📝 CRUD de estudiantes (registrar, listar, editar, eliminar)
+│   └── reportes.js                                       # 📊 Generación de reportes (fetch datos, renderizar gráficos, exportar)
+│
+├── backend/                                              # 🖥️ Servidor Node.js + Express
+│   ├── server.js                                         # 🚀 Punto de entrada del backend (configura Express, CORS, rutas)
+│   ├── db.js                                             # 🔌 Conexión a MySQL (pool de conexiones, credenciales)
+│   └── routes/                                           # 🛣️ Endpoints de la API REST
+│       ├── cursos.js                                     # 🎓 Rutas para preselección (seleccionar, eliminar, ver)
+│       ├── materias.js                                   # 📚 Rutas CRUD para materias (GET, POST, PUT, DELETE)
+│       ├── estudiantes.js                                # 👨‍🎓 Rutas CRUD para estudiantes (registro, consulta, actualización)
+│       └── reportes.js                                   # 📈 Rutas para reportes (estadísticas por periodo, top materias)
+│
+└── database.sql                                          # 💾 Script SQL para crear BD y tablas con datos de ejemplo
+
+
+Script SQL Base de dato de materias
+
+-- Insertar todas las materias del pensum
+INSERT INTO materias (codigo, nombre, creditos) VALUES
+-- 1er Semestre
+('IC1222', 'Fundamentos de la Informática', 3),
+('DP0001', 'Deporte', 2),
+('IM1421', 'Matemática I', 5),
+('IM1223', 'Lógica Matemática', 3),
+('FC0001', 'Formación Constitucional', 2),
+('IH1124', 'Lenguaje y Comunicación', 2),
+('IH1125', 'Inglés I', 2),
+('EC005', 'Economía Digital', 2),
+
+-- 2do Semestre
+('IM2421', 'Matemática II', 5),
+('IH2124', 'Problemática Científica Tecnológica', 2),
+('IB2322', 'Física I', 4),
+('IME320', 'Electiva I (Conducta Humana)', 2),
+('IC2323', 'Algoritmos I', 3),
+('AC0001', 'Arte y Cultura', 2),
+('IH2125', 'Inglés II', 2),
+
+-- 3er Semestre
+('IC3323', 'Algoritmos II', 3),
+('IME520', 'Electiva II (Legislación Informática)', 2),
+('IC3244', 'Programación I', 4),
+('IM3421', 'Matemática III', 5),
+('IB3322', 'Física II', 4),
+('IH3125', 'Metodología y Técnicas de Investigación', 2),
+
+-- 4to Semestre
+('IM5421', 'Probabilidades y Estadística', 3),
+('IM4421', 'Matemática IV', 5),
+('IC4244', 'Programación II', 4),
+('IME720', 'Electiva III (Mantenimiento del Computador)', 2),
+('IM4323', 'Estructuras Discretas I', 4),
+('IS4225', 'Base de Datos', 3),
+
+-- 5to Semestre
+('IS5205', 'Teoría de Sistemas', 2),
+('IM5221', 'Álgebra Booleana', 3),
+('IM5323', 'Estructuras Discretas II', 4),
+('IC5244', 'Programación III', 4),
+('IMEIV', 'Electiva IV (Teleinformática)', 2),
+('IC5422', 'Organización del Computador', 5),
+
+-- 6to Semestre
+('ID6241', 'Investigación de Operaciones', 4),
+('IC6322', 'Arquitectura del Computador', 4),
+('IS6425', 'Sistemas de Información I', 5),
+('IM6243', 'Métodos Numéricos', 4),
+('ID6124', 'Ingeniería Económica', 2),
+('IMEV', 'Electiva V', 2),
+
+-- 7mo Semestre
+('ID7323', 'Organización y Gestión Empresa', 4),
+('IS7244', 'Traductores e Intérpretes', 4),
+('IC7322', 'Sistemas Operativos', 4),
+('IS7324', 'Sistemas de Información II', 5),
+('ID7322', 'Control de Proyectos', 4),
+
+-- 8vo Semestre
+('EA', 'Electiva de Área I', 4),
+('ID8082', 'Pasantía', 4),
+('IS8243', 'Lenguaje de Programación', 4),
+('IS8424', 'Sistemas de Información III', 5),
+('IT8241', 'Redes', 4),
+
+-- 9no Semestre
+('EL9325', 'Electiva Libre I', 3),
+('IT9241', 'Sistemas Distribuidos', 4),
+('EA9244', 'Electiva de Área II', 4),
+('IH9202', 'Ética Profesional', 2),
+('PG9083', 'Proyecto de Grado I', 4),
+
+-- 10mo Semestre
+('EA0244', 'Electiva de Área III', 4),
+('EL', 'Electiva Libre II', 3),
+('PG0083', 'Proyecto de Grado II', 4),
+('ISO222', 'Informática Educativa', 3),
+('ID0221', 'Gerencia de Proyecto', 3);
