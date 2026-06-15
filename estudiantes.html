@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Preselección de Cursos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="parallax-bg"></div>
+    <div class="overlay"></div>
+
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="logo-text">
+                    <h1>Preselección de Cursos</h1>
+                    <p id="headerSubtitle">Sistema de Planificación Académica</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div class="status-indicator" id="statusIndicator">
+                    <i class="fas fa-circle" id="statusIcon"></i>
+                    <span id="statusText">Verificando...</span>
+                </div>
+                <div class="nav-links">
+                    <a href="estudiantes.html" style="background:rgba(255,255,255,0.2)">Inicio</a>
+                    <a href="preseleccion.html">Preselección</a>
+                    <a href="miPerfil.html">Mi Perfil</a>
+                    <a href="soporteTecnico.html">Soporte</a>
+                </div>
+                <div class="user-info">
+                    <span id="userName" style="color:white"></span>
+                    <button class="logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== SECCIÓN ESTUDIANTE ==================== -->
+    <div id="seccionEstudiante" class="seccion-estudiante">
+        <div class="main-content">
+            <div class="welcome-card">
+                <h2 id="welcomeMessage">Bienvenido/a</h2>
+                <p>Aquí puedes consultar el catálogo de materias y ver tus preselecciones.</p>
+            </div>
+
+            <!-- Banner de estado de preselección -->
+            <div id="preseleccionStatus" class="info-banner" style="display: none;">
+                <i class="fas fa-info-circle"></i>
+                <span id="preseleccionStatusText">Cargando estado...</span>
+            </div>
+
+            <div id="offlineBanner" class="info-banner warning" style="display: none;">
+                <i class="fas fa-wifi"></i>
+                <span>⚠️ Estás en MODO OFFLINE. Puedes ver tus datos y materias, pero NO puedes hacer nuevas preselecciones.</span>
+            </div>
+
+            <div id="readonlyBanner" class="info-banner" style="display: none;">
+                <i class="fas fa-info-circle"></i>
+                <span>📋 Modo SOLO LECTURA. Puedes consultar materias y descargar tu información en PDF.</span>
+                <button id="downloadPdfBtn" class="btn-pdf"><i class="fas fa-file-pdf"></i> Descargar PDF</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number" id="totalMaterias">0</div><div class="stat-label">Materias Disponibles</div></div>
+                <div class="stat-card"><div class="stat-number" id="misSelecciones">0</div><div class="stat-label">Mis Materias Seleccionadas</div></div>
+                <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">Máximo Permitido</div></div>
+                <div class="stat-card"><div class="stat-number">2026-3</div><div class="stat-label">Periodo Actual</div></div>
+            </div>
+
+            <div class="tabs" id="tabsContainer"></div>
+
+            <div class="materias-table-container">
+                <table class="materias-table">
+                    <thead><tr><th>Código</th><th>Nombre de la Materia</th><th>U.C.</th><th>Semestre</th></tr></thead>
+                    <tbody id="materiasTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="preselecciones-card">
+                <h3><i class="fas fa-list-check"></i> Mis Materias Preseleccionadas</h3>
+                <div id="preseleccionesList" class="preseleccion-items"><div class="empty-preseleccion">No has seleccionado ninguna materia</div></div>
+                <button id="irPreseleccionBtn" class="btn-primary"><i class="fas fa-arrow-right"></i> Ir a Preselección</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECCIÓN ADMIN ==================== -->
+    <div id="seccionAdmin" class="seccion-admin">
+        <div class="main-content">
+            <div class="welcome-card">
+                <h2 id="adminWelcomeMessage">Panel de Administración</h2>
+                <p>Bienvenido al sistema de gestión. Aquí puedes administrar estudiantes, ver estadísticas y generar reportes.</p>
+            </div>
+
+            <div id="adminAlertSuccess" class="alert alert-success"><i class="fas fa-check-circle"></i> <span></span></div>
+            <div id="adminAlertError" class="alert alert-error"><i class="fas fa-times-circle"></i> <span></span></div>
+
+            <div class="admin-stats">
+                <div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-users"></i></div><div class="admin-stat-info"><h3 id="totalEstudiantes">0</h3><p>Estudiantes Registrados</p></div></div>
+                <div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-user-graduate"></i></div><div class="admin-stat-info"><h3 id="totalEstudiantesActivos">0</h3><p>Estudiantes Activos</p></div></div>
+                <div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-check-circle"></i></div><div class="admin-stat-info"><h3 id="totalPreselecciones">0</h3><p>Preselecciones Realizadas</p></div></div>
+                <div class="admin-stat-card"><div class="admin-stat-icon"><i class="fas fa-chalkboard"></i></div><div class="admin-stat-info"><h3 id="totalSecciones">0</h3><p>Secciones Sugeridas</p></div></div>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-card"><h3><i class="fas fa-chart-pie"></i> Población por Semestre</h3><canvas id="semestreChart" width="400" height="300"></canvas></div>
+                <div class="admin-card"><h3><i class="fas fa-chart-bar"></i> Preselecciones por Materia (Top 10)</h3><canvas id="preseleccionesChart" width="400" height="300"></canvas></div>
+            </div> 
+            <br> 
+
+            <!-- Control de Preselección -->
+            <div class="admin-card">
+                <h3><i class="fas fa-calendar-alt"></i> Control de Preselecciones</h3>
+                <div id="controlPreseleccionInfo" class="alert alert-info" style="display: flex; background: #e0e7ff; margin-bottom: 1rem;">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="estadoPreseleccion">Cargando...</span>
+                </div>
+                <div class="form-group">
+                    <label>Seleccionar Periodo</label>
+                    <select id="selectPeriodo" class="form-control">
+                        <option value="">Cargando periodos...</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha de Apertura</label>
+                        <input type="datetime-local" id="fechaApertura" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Cierre (opcional)</label>
+                        <input type="datetime-local" id="fechaCierre" class="form-control">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                    <button id="btnAbrirPreseleccion" class="btn-primary" onclick="abrirPreseleccion()">
+                        <i class="fas fa-play-circle"></i> Abrir Preselección
+                    </button>
+                    <button id="btnCerrarPreseleccion" class="btn-danger" onclick="cerrarPreseleccion()" style="background: #dc2626;">
+                        <i class="fas fa-stop-circle"></i> Cerrar Preselección
+                    </button>
+                </div>
+                <div id="mensajePreseleccion" style="margin-top: 1rem; font-size: 0.85rem;"></div>
+            </div>
+            <br>
+            <br>
+            <div class="admin-card">
+                <h3><i class="fas fa-users"></i> Gestión de Estudiantes</h3>
+                <div class="search-bar">
+                    <input type="text" id="searchEstudiante" placeholder="🔍 Buscar por nombre, carnet o email...">
+                    <select id="filtroSemestre"><option value="">Todos los semestres</option>
+                        <option value="1">1er Semestre</option><option value="2">2do Semestre</option>
+                        <option value="3">3er Semestre</option><option value="4">4to Semestre</option>
+                        <option value="5">5to Semestre</option><option value="6">6to Semestre</option>
+                        <option value="7">7mo Semestre</option><option value="8">8vo Semestre</option>
+                        <option value="9">9no Semestre</option><option value="10">10mo Semestre</option>
+                    </select>
+                    <button class="btn-add" onclick="abrirModalRegistroEstudiante()"><i class="fas fa-plus"></i> Nuevo Estudiante</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table"><thead><tr><th>ID</th><th>Carnet</th><th>Nombre</th><th>Email</th><th>Semestre</th><th>Presels</th><th>Acciones</th></tr></thead>
+                    <tbody id="listaEstudiantes"></tbody></table>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+            <h3></>
+            <br> 
+            <br> 
+            <div class="admin-card">
+                <h3><i class="fas fa-list-check"></i> Reporte de Preselecciones por Materia</h3>
+                <div class="periodo-selector">
+                    <label>Periodo:</label>
+                    <select id="periodoReporte"><option value="2026-3">2026-3 (Verano)</option></select>
+                    <button class="btn-small btn-view" onclick="cargarReportePreselecciones()">Consultar</button>
+                    <button class="btn-small btn-pdf" onclick="exportarReportePDF()">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table"><thead><tr><th>Código</th><th>Materia</th><th>U.C.</th><th>Preselecciones</th><th>% Demanda</th><th>Secciones</th></tr></thead>
+                    <tbody id="reportePreselecciones"></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div id="estudianteModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle">Registrar Estudiante</h3><button class="close-modal" onclick="cerrarModal()">&times;</button></div>
+    <form id="estudianteForm"><div class="form-group"><label>Carnet *</label><input type="text" id="regCarnet" required></div>
+    <div class="form-group"><label>Nombre Completo *</label><input type="text" id="regNombre" required></div>
+    <div class="form-group"><label>Email *</label><input type="email" id="regEmail" required></div>
+    <div class="form-row"><div class="form-group"><label>Teléfono</label><input type="text" id="regTelefono"></div><div class="form-group"><label>Edad</label><input type="number" id="regEdad"></div></div>
+    <div class="form-group"><label>Semestre *</label><select id="regSemestre" required><option value="">Selecciona</option>
+        <option value="1">1er Semestre</option><option value="2">2do Semestre</option><option value="3">3er Semestre</option>
+        <option value="4">4to Semestre</option><option value="5">5to Semestre</option><option value="6">6to Semestre</option>
+        <option value="7">7mo Semestre</option><option value="8">8vo Semestre</option><option value="9">9no Semestre</option><option value="10">10mo Semestre</option></select></div>
+    <div class="form-group"><label>Contraseña *</label><input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required></div>
+    <button type="submit" class="btn-primary" style="width:100%"><i class="fas fa-save"></i> Guardar</button></form></div></div>
+
+    <div id="resetModal" class="modal"><div class="modal-content"><div class="modal-header"><h3><i class="fas fa-key"></i> Resetear Contraseña</h3><button class="close-modal" onclick="cerrarResetModal()">&times;</button></div>
+    <p>Estudiante: <strong id="resetNombre"></strong></p><p>Carnet: <strong id="resetCarnet"></strong></p>
+    <div class="form-group"><label>Nueva Contraseña</label><input type="password" id="nuevaPassword" placeholder="Mínimo 6 caracteres"></div>
+    <button class="btn-primary" onclick="confirmarResetPassword()" style="width:100%"><i class="fas fa-save"></i> Guardar Nueva Contraseña</button></div></div>
+
+    <footer class="main-footer"><div class="footer-container"><div class="footer-grid">
+        <div class="footer-col"><h4>Sistema de Preselección</h4><p>Plataforma para la preselección de cursos del periodo de verano.</p></div>
+        <div class="footer-col"><h4>Contacto</h4><ul><li><i class="fas fa-envelope"></i> soporte@preseleccion.edu</li><li><i class="fas fa-phone"></i> +58 (212) 555-1234</li></ul></div>
+    </div><div class="footer-bottom"><p>&copy; 2026 Sistema de Preselección de Cursos</p><p>Desarrollado por <strong>Juliexis & Gabrie</strong></p></div></div></footer>
+
+    <script>
+    // =====================================================
+    // FUNCIÓN CERRAR SESIÓN (DEFINIDA AL PRINCIPIO)
+    // =====================================================
+    function cerrarSesion() {
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    }
+    
+    // =====================================================
+    // DETECTAR TIPO DE USUARIO (ADMIN o ESTUDIANTE)
+    // =====================================================
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    if (!user) {
+        window.location.href = 'login.html';
+    }
+    
+    if (user.carnet === 'admin' && user.rol !== 'admin') {
+        user.rol = 'admin';
+        localStorage.setItem('user', JSON.stringify(user));
+    }
+    
+    const esAdmin = (user.rol === 'admin');
+    
+    const seccionAdmin = document.getElementById('seccionAdmin');
+    const seccionEstudiante = document.getElementById('seccionEstudiante');
+    
+    if (esAdmin) {
+        seccionAdmin.classList.add('visible');
+        seccionEstudiante.classList.remove('visible');
+        document.getElementById('headerSubtitle').textContent = 'Panel de Administración';
+        document.getElementById('userName').textContent = `👑 ${user.nombre}`;
+        document.getElementById('adminWelcomeMessage').textContent = `Bienvenido, ${user.nombre}`;
+    } else {
+        seccionAdmin.classList.remove('visible');
+        seccionEstudiante.classList.add('visible');
+        document.getElementById('headerSubtitle').textContent = 'Área del Estudiante';
+        document.getElementById('userName').textContent = `👤 ${user.nombre}`;
+        document.getElementById('welcomeMessage').textContent = `¡Bienvenido/a, ${user.nombre}!`;
+    }
+    
+    // =====================================================
+    // VARIABLES GLOBALES
+    // =====================================================
+    const API_URL = 'http://localhost:3000/api';
+    let conexionBD = false;
+    
+    // =====================================================
+    // VERIFICAR CONEXIÓN (SE EJECUTA PARA TODOS)
+    // =====================================================
+    async function verificarConexion() {
+        const statusIcon = document.getElementById('statusIcon');
+        const statusText = document.getElementById('statusText');
+        try {
+            const response = await fetch(`${API_URL}/health`);
+            if (response.ok) {
+                conexionBD = true;
+                statusIcon.className = 'fas fa-circle status-online';
+                statusText.textContent = 'Conectado al servidor';
+            } else throw new Error();
+        } catch (error) {
+            conexionBD = false;
+            statusIcon.className = 'fas fa-circle status-offline';
+            statusText.textContent = 'Modo offline';
+        }
+    }
+    
+    // EJECUTAR VERIFICACIÓN DE CONEXIÓN PARA TODOS (estudiantes y admin)
+    verificarConexion();
+    setInterval(verificarConexion, 30000);
+    
+    // =====================================================
+    // FUNCIONES PARA ESTUDIANTE
+    // =====================================================
+    const materias = [
+        { codigo: "IC1222", nombre: "Fundamentos de la Informática", uc: 3, semestre: 1 },
+        { codigo: "DP0001", nombre: "Deporte", uc: 2, semestre: 1 },
+        { codigo: "IM1421", nombre: "Matemática I", uc: 5, semestre: 1 },
+        { codigo: "IM1223", nombre: "Lógica Matemática", uc: 3, semestre: 1 },
+        { codigo: "FC0001", nombre: "Formación Constitucional", uc: 2, semestre: 1 },
+        { codigo: "IH1124", nombre: "Lenguaje y Comunicación", uc: 2, semestre: 1 },
+        { codigo: "IH1125", nombre: "Inglés I", uc: 2, semestre: 1 },
+        { codigo: "EC005", nombre: "Economía Digital", uc: 2, semestre: 1 },
+        { codigo: "IM2421", nombre: "Matemática II", uc: 5, semestre: 2 },
+        { codigo: "IH2124", nombre: "Problemática Científica Tecnológica", uc: 2, semestre: 2 },
+        { codigo: "IB2322", nombre: "Física I", uc: 4, semestre: 2 },
+        { codigo: "IME320", nombre: "Electiva I (Conducta Humana)", uc: 2, semestre: 2 },
+        { codigo: "IC2323", nombre: "Algoritmos I", uc: 3, semestre: 2 },
+        { codigo: "AC0001", nombre: "Arte y Cultura", uc: 2, semestre: 2 },
+        { codigo: "IH2125", nombre: "Inglés II", uc: 2, semestre: 2 },
+        { codigo: "IC3323", nombre: "Algoritmos II", uc: 3, semestre: 3 },
+        { codigo: "IME520", nombre: "Electiva II (Legislación Informática)", uc: 2, semestre: 3 },
+        { codigo: "IC3244", nombre: "Programación I", uc: 4, semestre: 3 },
+        { codigo: "IM3421", nombre: "Matemática III", uc: 5, semestre: 3 },
+        { codigo: "IB3322", nombre: "Física II", uc: 4, semestre: 3 },
+        { codigo: "IH3125", nombre: "Metodología y Técnicas de Investigación", uc: 2, semestre: 3 },
+        { codigo: "IM5421", nombre: "Probabilidades y Estadística", uc: 3, semestre: 4 },
+        { codigo: "IM4421", nombre: "Matemática IV", uc: 5, semestre: 4 },
+        { codigo: "IC4244", nombre: "Programación II", uc: 4, semestre: 4 },
+        { codigo: "IME720", nombre: "Electiva III (Mantenimiento del Computador)", uc: 2, semestre: 4 },
+        { codigo: "IM4323", nombre: "Estructuras Discretas I", uc: 4, semestre: 4 },
+        { codigo: "IS4225", nombre: "Base de Datos", uc: 3, semestre: 4 },
+        { codigo: "IS5205", nombre: "Teoría de Sistemas", uc: 2, semestre: 5 },
+        { codigo: "IM5221", nombre: "Álgebra Booleana", uc: 3, semestre: 5 },
+        { codigo: "IM5323", nombre: "Estructuras Discretas II", uc: 4, semestre: 5 },
+        { codigo: "IC5244", nombre: "Programación III", uc: 4, semestre: 5 },
+        { codigo: "IMEIV", nombre: "Electiva IV (Teleinformática)", uc: 2, semestre: 5 },
+        { codigo: "IC5422", nombre: "Organización del Computador", uc: 5, semestre: 5 },
+        { codigo: "ID6241", nombre: "Investigación de Operaciones", uc: 4, semestre: 6 },
+        { codigo: "IC6322", nombre: "Arquitectura del Computador", uc: 4, semestre: 6 },
+        { codigo: "IS6425", nombre: "Sistemas de Información I", uc: 5, semestre: 6 },
+        { codigo: "IM6243", nombre: "Métodos Numéricos", uc: 4, semestre: 6 },
+        { codigo: "ID6124", nombre: "Ingeniería Económica", uc: 2, semestre: 6 },
+        { codigo: "IMEV", nombre: "Electiva V", uc: 2, semestre: 6 },
+        { codigo: "ID7323", nombre: "Organización y Gestión Empresa", uc: 4, semestre: 7 },
+        { codigo: "IS7244", nombre: "Traductores e Intérpretes", uc: 4, semestre: 7 },
+        { codigo: "IC7322", nombre: "Sistemas Operativos", uc: 4, semestre: 7 },
+        { codigo: "IS7324", nombre: "Sistemas de Información II", uc: 5, semestre: 7 },
+        { codigo: "ID7322", nombre: "Control de Proyectos", uc: 4, semestre: 7 },
+        { codigo: "EA", nombre: "Electiva de Área I", uc: 4, semestre: 8 },
+        { codigo: "ID8082", nombre: "Pasantía", uc: 4, semestre: 8 },
+        { codigo: "IS8243", nombre: "Lenguaje de Programación", uc: 4, semestre: 8 },
+        { codigo: "IS8424", nombre: "Sistemas de Información III", uc: 5, semestre: 8 },
+        { codigo: "IT8241", nombre: "Redes", uc: 4, semestre: 8 },
+        { codigo: "EL9325", nombre: "Electiva Libre I", uc: 3, semestre: 9 },
+        { codigo: "IT9241", nombre: "Sistemas Distribuidos", uc: 4, semestre: 9 },
+        { codigo: "EA9244", nombre: "Electiva de Área II", uc: 4, semestre: 9 },
+        { codigo: "IH9202", nombre: "Ética Profesional", uc: 2, semestre: 9 },
+        { codigo: "PG9083", nombre: "Proyecto de Grado I", uc: 4, semestre: 9 },
+        { codigo: "EA0244", nombre: "Electiva de Área III", uc: 4, semestre: 10 },
+        { codigo: "EL", nombre: "Electiva Libre II", uc: 3, semestre: 10 },
+        { codigo: "PG0083", nombre: "Proyecto de Grado II", uc: 4, semestre: 10 },
+        { codigo: "ISO222", nombre: "Informática Educativa", uc: 3, semestre: 10 },
+        { codigo: "ID0221", nombre: "Gerencia de Proyecto", uc: 3, semestre: 10 }
+    ];
+    
+    let usuarioActual = user;
+    let semestreActual = 1;
+    
+    function cargarPreseleccionesGuardadas() {
+        const key = `preselecciones_${usuarioActual.carnet}`;
+        const guardadas = JSON.parse(localStorage.getItem(key) || '[]');
+        const container = document.getElementById('preseleccionesList');
+        if (guardadas.length === 0) {
+            container.innerHTML = '<div class="empty-preseleccion">No has seleccionado ninguna materia</div>';
+        } else {
+            container.innerHTML = guardadas.map(materia => `<div class="preseleccion-item"><div><strong>${materia.codigo}</strong> - ${materia.nombre}<br><small>${materia.uc} U.C. - ${materia.semestre}° Semestre</small></div></div>`).join('');
+        }
+        document.getElementById('misSelecciones').textContent = guardadas.length;
+    }
+    
+    function generarTabs() {
+        const semestres = [...new Set(materias.map(m => m.semestre))].sort();
+        const tabsContainer = document.getElementById('tabsContainer');
+        if (!tabsContainer) return;
+        tabsContainer.innerHTML = semestres.map(sem => `<button class="tab-btn ${sem === semestreActual ? 'active' : ''}" onclick="cambiarSemestre(${sem})">${sem}° Semestre</button>`).join('');
+    }
+    
+    function cambiarSemestre(semestre) {
+        semestreActual = semestre;
+        document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('active'); if (btn.textContent.includes(`${semestre}°`)) btn.classList.add('active'); });
+        const materiasFiltradas = materias.filter(m => m.semestre === semestre);
+        const tbody = document.getElementById('materiasTableBody');
+        if (tbody) {
+            tbody.innerHTML = materiasFiltradas.map(materia => `<tr><td><strong>${materia.codigo}</strong></td><td>${materia.nombre}</td><td>${materia.uc}</td><td><span class="badge-semestre">${materia.semestre}° Sem</span></td></tr>`).join('');
+            document.getElementById('totalMaterias').textContent = materiasFiltradas.length;
+        }
+    }
+    
+    function descargarPDF() {
+        const preselecciones = JSON.parse(localStorage.getItem(`preselecciones_${usuarioActual.carnet}`) || '[]');
+        const contenido = document.createElement('div');
+        contenido.style.padding = '20px';
+        contenido.style.fontFamily = 'Arial, sans-serif';
+        contenido.innerHTML = `
+            <h1 style="color:#1e5a8a; text-align:center;">Sistema de Preselección de Cursos</h1>
+            <h2 style="text-align:center;">Periodo de Verano 2026-3</h2>
+            <hr>
+            <h3>📋 Datos del Estudiante</h3>
+            <table style="width:100%; border-collapse: collapse;">
+                <tr><td style="padding:5px;"><strong>Nombre:</strong></td><td>${usuarioActual.nombre}</tr></tr>
+                <tr><td style="padding:5px;"><strong>Carnet:</strong></td><td>${usuarioActual.carnet}</td></tr>
+                <tr><td style="padding:5px;"><strong>Email:</strong></td><td>${usuarioActual.email || 'No registrado'}</td></tr>
+                <tr><td style="padding:5px;"><strong>Semestre:</strong></td><td>${usuarioActual.semestre}° Semestre</td></tr>
+            </table>
+            <h3>📚 Materias Preseleccionadas</h3>
+            ${preselecciones.length === 0 ? '<p>No has seleccionado ninguna materia</p>' : `
+                <table style="width:100%; border-collapse: collapse;">
+                    <tr style="background:#1e5a8a; color:white;"><th>Código</th><th>Materia</th><th>U.C.</th><th>Semestre</th></tr>
+                    ${preselecciones.map(m => `<tr><td>${m.codigo}</td><td>${m.nombre}</td><td>${m.uc}</td><td>${m.semestre}°</td></tr>`).join('')}
+                </table>
+            `}
+            <hr>
+            <p style="text-align:center;">Documento generado el ${new Date().toLocaleString()}</p>
+        `;
+        const opt = { margin: [0.5, 0.5, 0.5, 0.5], filename: `Datos_Estudiante_${usuarioActual.carnet}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+        if (typeof html2pdf !== 'undefined') html2pdf().set(opt).from(contenido).save();
+        else alert('Error: No se puede generar el PDF');
+    }
+    
+    if (!esAdmin) {
+        generarTabs();
+        cambiarSemestre(usuarioActual.semestre || 1);
+        cargarPreseleccionesGuardadas();
+        document.getElementById('downloadPdfBtn')?.addEventListener('click', descargarPDF);
+        document.getElementById('irPreseleccionBtn')?.addEventListener('click', () => {
+            window.location.href = 'preseleccion.html';
+        });
+    }
+    
+    // =====================================================
+    // FUNCIONES PARA ADMIN
+    // =====================================================
+    let estudiantes = [];
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let graficoPreselecciones = null;
+    let graficoSemestre = null;
+    let resetEstudianteId = null;
+    
+    function mostrarAlerta(tipo, mensaje) {
+        const alertDiv = document.getElementById(`adminAlert${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+        if (alertDiv) { alertDiv.querySelector('span').textContent = mensaje; alertDiv.style.display = 'flex'; setTimeout(() => alertDiv.style.display = 'none', 4000); }
+    }
+    
+    function cerrarModal() { document.getElementById('estudianteModal').style.display = 'none'; }
+    function cerrarResetModal() { document.getElementById('resetModal').style.display = 'none'; }
+    function abrirModalRegistroEstudiante() { document.getElementById('modalTitle').textContent = 'Registrar Estudiante'; document.getElementById('estudianteForm').reset(); document.getElementById('estudianteModal').style.display = 'flex'; }
+    
+    document.getElementById('estudianteForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = { carnet: document.getElementById('regCarnet').value.trim(), nombre: document.getElementById('regNombre').value.trim(), email: document.getElementById('regEmail').value.trim(), telefono: document.getElementById('regTelefono').value, edad: document.getElementById('regEdad').value, semestre: document.getElementById('regSemestre').value, password: document.getElementById('regPassword').value };
+        if (!data.password || data.password.length < 6) { mostrarAlerta('error', 'La contraseña debe tener al menos 6 caracteres'); return; }
+        try {
+            const response = await fetch(`${API_URL}/estudiantes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const result = await response.json();
+            if (result.success) { mostrarAlerta('success', 'Estudiante registrado'); cerrarModal(); cargarEstadisticas(); cargarListaEstudiantes(); cargarGraficoSemestre(); }
+            else mostrarAlerta('error', result.error);
+        } catch (error) { mostrarAlerta('error', 'Error al registrar'); }
+    });
+    
+    async function cargarEstadisticas() {
+        try {
+            const [estudiantesRes, preseleccionesRes] = await Promise.all([fetch(`${API_URL}/estudiantes`).then(r => r.json()), fetch(`${API_URL}/preselecciones/reporte/2026-3`).then(r => r.json())]);
+            document.getElementById('totalEstudiantes').textContent = estudiantesRes.length;
+            document.getElementById('totalEstudiantesActivos').textContent = estudiantesRes.filter(e => e.semestre > 0).length;
+            const totalPres = preseleccionesRes.reduce((sum, m) => sum + (m.total_preselecciones || 0), 0);
+            document.getElementById('totalPreselecciones').textContent = totalPres;
+            const totalSecciones = preseleccionesRes.reduce((sum, m) => sum + Math.ceil((m.total_preselecciones || 0) / 30), 0);
+            document.getElementById('totalSecciones').textContent = totalSecciones;
+        } catch (error) { console.error('Error stats:', error); }
+    }
+    
+    async function cargarListaEstudiantes() {
+        try { const response = await fetch(`${API_URL}/estudiantes`); estudiantes = await response.json(); filtrarYMostrar(); cargarGraficoSemestre(); } catch (error) { console.error('Error estudiantes:', error); }
+    }
+    
+    function filtrarYMostrar() {
+        const searchTerm = document.getElementById('searchEstudiante')?.value.toLowerCase() || '';
+        const semestreFiltro = document.getElementById('filtroSemestre')?.value || '';
+        let filtrados = estudiantes.filter(e => e.nombre.toLowerCase().includes(searchTerm) || e.carnet.toLowerCase().includes(searchTerm) || e.email.toLowerCase().includes(searchTerm));
+        if (semestreFiltro) filtrados = filtrados.filter(e => e.semestre == semestreFiltro);
+        const totalPages = Math.ceil(filtrados.length / itemsPerPage);
+        const start = (currentPage - 1) * itemsPerPage;
+        renderTabla(filtrados.slice(start, start + itemsPerPage));
+        renderPagination(totalPages);
+    }
+    
+    function renderTabla(data) {
+        const tbody = document.getElementById('listaEstudiantes');
+        if (!tbody) return;
+        if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">No hay estudiantes registrados</td></tr>'; return; }
+        tbody.innerHTML = data.map(e => `<tr><td>${e.id}</td><td><strong>${e.carnet}</strong></td><td>${e.nombre}</td><td>${e.email}</td><td><span class="badge-semestre">${e.semestre}° Sem</span></td><td>${e.total_preselecciones || 0}</td><td><button class="btn-small btn-reset" onclick="abrirResetPassword(${e.id}, '${e.nombre}', '${e.carnet}')"><i class="fas fa-key"></i> Reset</button><button class="btn-small btn-delete" onclick="eliminarEstudiante(${e.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+    }
+    
+    function renderPagination(totalPages) {
+        const container = document.getElementById('pagination');
+        if (!container) return;
+        if (totalPages <= 1) { container.innerHTML = ''; return; }
+        let html = '';
+        for (let i = 1; i <= totalPages; i++) html += `<button class="${i === currentPage ? 'active' : ''}" onclick="irPagina(${i})">${i}</button>`;
+        container.innerHTML = html;
+    }
+    
+    function irPagina(page) { currentPage = page; filtrarYMostrar(); }
+    document.getElementById('searchEstudiante')?.addEventListener('input', () => { currentPage = 1; filtrarYMostrar(); });
+    document.getElementById('filtroSemestre')?.addEventListener('change', () => { currentPage = 1; filtrarYMostrar(); });
+    
+    function abrirResetPassword(id, nombre, carnet) { resetEstudianteId = id; document.getElementById('resetNombre').textContent = nombre; document.getElementById('resetCarnet').textContent = carnet; document.getElementById('nuevaPassword').value = ''; document.getElementById('resetModal').style.display = 'flex'; }
+    
+    async function confirmarResetPassword() {
+        const nuevaPassword = document.getElementById('nuevaPassword').value;
+        if (!nuevaPassword || nuevaPassword.length < 6) { mostrarAlerta('error', 'Mínimo 6 caracteres'); return; }
+        try {
+            const response = await fetch(`${API_URL}/estudiantes/${resetEstudianteId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: nuevaPassword }) });
+            const result = await response.json();
+            if (result.success) { mostrarAlerta('success', 'Contraseña restablecida'); cerrarResetModal(); }
+            else mostrarAlerta('error', result.error);
+        } catch (error) { mostrarAlerta('error', 'Error'); }
+    }
+    
+    async function eliminarEstudiante(id) {
+        if (!confirm('¿Eliminar este estudiante?')) return;
+        try { await fetch(`${API_URL}/estudiantes/${id}`, { method: 'DELETE' }); mostrarAlerta('success', 'Estudiante eliminado'); cargarListaEstudiantes(); cargarEstadisticas(); cargarGraficoSemestre(); } catch (error) { mostrarAlerta('error', 'Error'); }
+    }
+    
+    async function cargarGraficoSemestre() {
+        try {
+            const response = await fetch(`${API_URL}/estudiantes`);
+            const estudiantes = await response.json();
+            const semestreCount = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0};
+            estudiantes.forEach(e => { if (e.semestre >= 1 && e.semestre <= 10) semestreCount[e.semestre]++; });
+            if (graficoSemestre) graficoSemestre.destroy();
+            const ctx = document.getElementById('semestreChart')?.getContext('2d');
+            if (ctx) graficoSemestre = new Chart(ctx, { type: 'pie', data: { labels: ['1°','2°','3°','4°','5°','6°','7°','8°','9°','10°'], datasets: [{ data: Object.values(semestreCount), backgroundColor: ['#1e5a8a','#2d6a9e','#3c7ab2','#4b8ac6','#5a9ada','#6aaade','#7abae2','#8acae6','#9adaea','#aaeaee'] }] }, options: { responsive: true } });
+        } catch (error) { console.error('Error gráfico:', error); }
+    }
+    
+    async function cargarReportePreselecciones() {
+        try {
+            const response = await fetch(`${API_URL}/preselecciones/reporte/2026-3`);
+            const data = await response.json();
+            const totalPreselecciones = data.reduce((sum, m) => sum + m.total_preselecciones, 0);
+            const tbody = document.getElementById('reportePreselecciones');
+            if (tbody) tbody.innerHTML = data.map(m => `<tr><td><strong>${m.codigo}</strong></td><td>${m.nombre}</td><td>${m.uc}</td><td>${m.total_preselecciones}</td><td>${totalPreselecciones > 0 ? ((m.total_preselecciones / totalPreselecciones) * 100).toFixed(1) : 0}%</td><td>${Math.ceil(m.total_preselecciones / 30)}</td></tr>`).join('');
+            if (graficoPreselecciones) graficoPreselecciones.destroy();
+            const top10 = data.slice(0, 10);
+            const ctx = document.getElementById('preseleccionesChart')?.getContext('2d');
+            if (ctx) graficoPreselecciones = new Chart(ctx, { type: 'bar', data: { labels: top10.map(m => m.codigo), datasets: [{ label: 'Preselecciones', data: top10.map(m => m.total_preselecciones), backgroundColor: '#1e5a8a' }] }, options: { responsive: true } });
+        } catch (error) { console.error('Error reporte:', error); }
+    }
+    
+    function exportarReportePDF() {
+        const tabla = document.getElementById('reportePreselecciones');
+        if (!tabla || tabla.children.length === 0) {
+            mostrarAlerta('warning', 'No hay datos para exportar');
+            return;
+        }
+        const periodoSelect = document.getElementById('periodoReporte');
+        const periodo = periodoSelect ? (periodoSelect.options[periodoSelect.selectedIndex]?.text || '2026-3') : '2026-3';
+        const contenido = document.createElement('div');
+        contenido.style.padding = '20px';
+        contenido.style.fontFamily = 'Arial, sans-serif';
+        contenido.innerHTML = `<h1 style="color: #1e5a8a; text-align: center;">Sistema de Preselección de Cursos</h1><h2 style="text-align: center; color: #0d3b66;">Reporte de Preselecciones por Materia</h2><p style="text-align: center; color: #64748b;">Periodo: ${periodo} | Generado: ${new Date().toLocaleString()}</p><table style="width: 100%; border-collapse: collapse; margin-top: 20px;"><thead><tr style="background: #1e5a8a; color: white;"><th>Código</th><th>Materia</th><th>U.C.</th><th>Preselecciones</th><th>% Demanda</th><th>Secciones</th></tr></thead><tbody>`;
+        const filas = tabla.querySelectorAll('tr');
+        filas.forEach(fila => {
+            const celdas = fila.querySelectorAll('td');
+            if (celdas.length >= 6) {
+                contenido.innerHTML += `<tr><td>${celdas[0]?.innerHTML || ''}</td><td>${celdas[1]?.innerHTML || ''}</td><td>${celdas[2]?.innerHTML || ''}</td><td>${celdas[3]?.innerHTML || ''}</td><td>${celdas[4]?.innerHTML || ''}</td><td>${celdas[5]?.innerHTML || ''}</td></tr>`;
+            }
+        });
+        contenido.innerHTML += `</tbody></table><div style="margin-top: 30px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px;"><p>Sistema de Preselección de Cursos - Periodo de Verano 2026</p><p>Desarrollado por Juliexis & Gabrie</p></div>`;
+        const opt = { margin: [0.5, 0.5, 0.5, 0.5], filename: `Reporte_Preselecciones_${periodo}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, letterRendering: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } };
+        if (typeof html2pdf !== 'undefined') html2pdf().set(opt).from(contenido).save();
+        else mostrarAlerta('error', 'Error al generar PDF');
+    }
+    
+    async function verificarEstadoPreseleccion() {
+    try {
+            const response = await fetch(`${API_URL}/preselecciones/estado`);
+            const estado = await response.json();
+            const statusBanner = document.getElementById('preseleccionStatus');
+            const statusText = document.getElementById('preseleccionStatusText');
+            const irPreseleccionBtn = document.getElementById('irPreseleccionBtn');
+        
+            if (estado.activo) {
+                statusBanner.className = 'info-banner';
+                statusBanner.style.display = 'flex';
+                statusText.innerHTML = `✅ ${estado.mensaje} - Periodo: ${estado.periodo.nombre}`;
+                if (irPreseleccionBtn) {
+                    irPreseleccionBtn.disabled = false;
+                    irPreseleccionBtn.title = '';
+                }
+            } else {
+            statusBanner.className = 'info-banner warning';
+                statusBanner.style.display = 'flex';
+                statusText.innerHTML = `🔒 ${estado.mensaje || 'Preselecciones cerradas. Contacta al administrador.'}`;
+                if (irPreseleccionBtn) {
+                    irPreseleccionBtn.disabled = true;
+                    irPreseleccionBtn.title = 'Preselecciones cerradas';
+                }
+            }
+        } catch (error) {
+            console.error('Error al verificar estado:', error);
+        }
+    }
+
+    async function cargarPeriodosDisponibles() {
+    try {
+        const response = await fetch(`${API_URL}/preselecciones/periodos-disponibles`);
+        const periodos = await response.json();
+        const select = document.getElementById('selectPeriodo');
+        if (select) {
+            select.innerHTML = '<option value="">Selecciona un periodo</option>';
+            periodos.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.anio} - ${p.periodo} (${p.fecha_inicio} al ${p.fecha_fin})</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando periodos:', error);
+    }
+}
+
+    async function cargarEstadoPreseleccion() {
+    try {
+        const response = await fetch(`${API_URL}/preselecciones/estado`);
+        const estado = await response.json();
+        const estadoDiv = document.getElementById('estadoPreseleccion');
+        const mensajeDiv = document.getElementById('mensajePreseleccion');
+        
+        if (estadoDiv) {
+            if (estado.activo) {
+                estadoDiv.innerHTML = `✅ ${estado.mensaje} - Periodo activo: ${estado.periodo.nombre}`;
+                estadoDiv.style.color = '#16a34a';
+                if (mensajeDiv) mensajeDiv.innerHTML = `<i class="fas fa-check-circle"></i> Las preselecciones están abiertas. Los estudiantes pueden seleccionar materias.`;
+            } else {
+                estadoDiv.innerHTML = `🔒 ${estado.mensaje || 'Preselecciones cerradas'}`;
+                estadoDiv.style.color = '#dc2626';
+                if (mensajeDiv) mensajeDiv.innerHTML = `<i class="fas fa-lock"></i> Las preselecciones están cerradas. Los estudiantes no pueden seleccionar materias.`;
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando estado:', error);
+    }
+}
+
+async function abrirPreseleccion() {
+    const periodoId = document.getElementById('selectPeriodo')?.value;
+    const fechaApertura = document.getElementById('fechaApertura')?.value;
+    const fechaCierre = document.getElementById('fechaCierre')?.value || null;
+    
+    if (!periodoId) {
+        mostrarAlerta('warning', 'Selecciona un periodo');
+        return;
+    }
+    
+    if (!fechaApertura) {
+        mostrarAlerta('warning', 'Selecciona una fecha de apertura');
+        return;
+    }
+    
+    const btnAbrir = document.getElementById('btnAbrirPreseleccion');
+    const originalText = btnAbrir.innerHTML;
+    btnAbrir.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Abriendo...';
+    btnAbrir.disabled = true;
+    
+    try {
+        const response = await fetch(`${API_URL}/preselecciones/abrir`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                periodo_id: periodoId,
+                fecha_apertura: fechaApertura,
+                fecha_cierre: fechaCierre || null
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            mostrarAlerta('success', result.message);
+            cargarEstadoPreseleccion();
+            if (document.getElementById('fechaApertura')) document.getElementById('fechaApertura').value = '';
+            if (document.getElementById('fechaCierre')) document.getElementById('fechaCierre').value = '';
+            if (document.getElementById('selectPeriodo')) document.getElementById('selectPeriodo').value = '';
+        } else {
+            mostrarAlerta('error', result.error);
+        }
+    } catch (error) {
+        mostrarAlerta('error', 'Error al abrir la preselección');
+    } finally {
+        btnAbrir.innerHTML = originalText;
+        btnAbrir.disabled = false;
+    }
+}
+
+async function cerrarPreseleccion() {
+    if (!confirm('¿Estás seguro de cerrar el periodo de preselección? Los estudiantes ya no podrán seleccionar materias.')) return;
+    
+    const btnCerrar = document.getElementById('btnCerrarPreseleccion');
+    const originalText = btnCerrar.innerHTML;
+    btnCerrar.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Cerrando...';
+    btnCerrar.disabled = true;
+    
+    try {
+            const response = await fetch(`${API_URL}/preselecciones/cerrar`, {
+            method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+        
+            const result = await response.json();
+        
+            if (response.ok) {
+                mostrarAlerta('success', result.message);
+                cargarEstadoPreseleccion();
+            } else {
+                mostrarAlerta('error', result.error);
+            }
+        } catch (error) {
+            mostrarAlerta('error', 'Error al cerrar la preselección');
+        } finally {
+            btnCerrar.innerHTML = originalText;
+            btnCerrar.disabled = false;
+        }
+    }
+
+    if (!esAdmin) {
+        generarTabs();
+        cambiarSemestre(usuarioActual.semestre || 1);
+        cargarPreseleccionesGuardadas();
+        verificarEstadoPreseleccion();  // ← NUEVO: verifica si las preselecciones están abiertas
+        setInterval(verificarEstadoPreseleccion, 30000);  // ← NUEVO: verifica cada 30 segundos
+        document.getElementById('downloadPdfBtn')?.addEventListener('click', descargarPDF);
+        document.getElementById('irPreseleccionBtn')?.addEventListener('click', () => {
+            window.location.href = 'preseleccion.html';
+        });
+    }
+
+    if (esAdmin) {
+        cargarPeriodosDisponibles();   // ← NUEVO: carga periodos para abrir
+        cargarEstadoPreseleccion();    // ← NUEVO: muestra estado actual
+        cargarEstadisticas();
+        cargarListaEstudiantes();
+        cargarReportePreselecciones();
+        setInterval(() => { cargarEstadisticas(); cargarReportePreselecciones(); }, 60000);
+    }
+
+    
+
+</script>
+
+</body>
+</html>
