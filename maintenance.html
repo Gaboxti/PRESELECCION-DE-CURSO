@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Función en Mantenimiento - Sistema de Preselección</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Fondo Parallax -->
+    <div class="parallax-bg"></div>
+    <div class="overlay"></div>
+
+    <!-- Header Fijo -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Preselección de Cursos</h1>
+                    <p>Sistema de Planificación Académica</p>
+                </div>
+            </div>
+            <div class="header-badge">
+                <i class="fas fa-calendar-alt"></i> Periodo de Verano 2026-3
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="maintenance-container">
+            <div class="maintenance-card">
+                <div class="card-body">
+                    <div class="icon-container">
+                        <div class="icon-circle">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                    </div>
+                    
+                    <h1 class="maintenance-title" id="functionTitle">Función en Mantenimiento</h1>
+                    <div class="badge">
+                        <i class="fas fa-code-branch"></i> En desarrollo
+                    </div>
+                    
+                    <div class="message">
+                        <p id="functionMessage">Esta funcionalidad se encuentra actualmente <strong>en proceso de construcción</strong>.</p>
+                        <p>Pronto estará disponible para todos los usuarios.</p>
+                    </div>
+                    
+                    <div class="feature-status">
+                        <h4><i class="fas fa-chart-line"></i> Estado del desarrollo</h4>
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <ul class="status-list">
+                            <li><i class="fas fa-check-circle"></i> Diseño de interfaz - Completado</li>
+                            <li><i class="fas fa-check-circle"></i> Estructura de base de datos - Completado</li>
+                            <li><i class="fas fa-spinner fa-pulse"></i> Lógica de negocio - En progreso</li>
+                            <li><i class="fas fa-clock"></i> Pruebas de integración - Pendiente</li>
+                        </ul>
+                    </div>
+                    
+                    <a href="login.html" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Volver al Inicio de Sesión
+                    </a>
+                    
+                    <div class="footer-note">
+                        <i class="fas fa-clock"></i> Tiempo estimado de finalización: Próximamente
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Transparente -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Sistema de Preselección</h4>
+                    <p>Plataforma diseñada para facilitar la preselección de cursos del periodo de verano, optimizando la planificación académica.</p>
+                    <div class="social-icons">
+                        <a href="maintenance.html?funcion=Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="maintenance.html?funcion=Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="maintenance.html?funcion=Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="maintenance.html?funcion=LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul>
+                        <li><a href="maintenance.html?funcion=Acerca%20del%20Sistema">📋 Acerca del Sistema</a></li>
+                        <li><a href="maintenance.html?funcion=Preguntas%20Frecuentes">❓ Preguntas Frecuentes</a></li>
+                        <li><a href="maintenance.html?funcion=Soporte%20Técnico">📞 Soporte Técnico</a></li>
+                        <li><a href="maintenance.html?funcion=Términos%20y%20Condiciones">📄 Términos y Condiciones</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> soporte@preseleccion.edu</li>
+                        <li><i class="fas fa-phone"></i> +58 (212) 555-1234</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Caracas, Venezuela</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Horario de Atención</h4>
+                    <ul>
+                        <li><i class="far fa-clock"></i> Lun - Vie: 8:00 AM - 5:00 PM</li>
+                        <li><i class="far fa-clock"></i> Sábados: 8:00 AM - 12:00 PM</li>
+                        <li><i class="far fa-calendar-times"></i> Domingos: Cerrado</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Sistema de Preselección de Cursos - Periodo de Verano</p>
+                <p>Desarrollado por <strong>Juliexis & Gabrie</strong></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Obtener el nombre de la función desde la URL
+        function getFunctionName() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('funcion') || null;
+        }
+        
+        // Actualizar el contenido según la función
+        const functionName = getFunctionName();
+        
+        if (functionName) {
+            const titleElement = document.getElementById('functionTitle');
+            if (titleElement) {
+                titleElement.textContent = `${functionName} - En Mantenimiento`;
+            }
+            
+            const messageElement = document.getElementById('functionMessage');
+            if (messageElement) {
+                messageElement.innerHTML = `El módulo de <strong>${functionName}</strong> se encuentra actualmente <strong>en proceso de construcción</strong>.`;
+            }
+        }
+
+        // ==================== EFECTO PARALLAX ====================
+        const parallaxBg = document.querySelector('.parallax-bg');
+        
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY;
+            // La imagen se mueve hacia abajo cuando scrolleas hacia abajo
+            parallaxBg.style.transform = `translateY(${scrollPosition * -0.15}px)`;
+        });
+    </script>
+</body>
+</html>
