@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preselección de Cursos - Selección de Materias</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="parallax-bg"></div>
+    <div class="overlay"></div>
+
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="logo-text">
+                    <h1>Preselección de Cursos</h1>
+                    <p>Selección de Materias - Verano 2026</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div class="status-indicator" id="statusIndicator">
+                    <i class="fas fa-circle" id="statusIcon"></i>
+                    <span id="statusText">Verificando...</span>
+                </div>
+                <div class="nav-links">
+                    <a href="estudiantes.html">Inicio</a>
+                    <a href="preseleccion.html" style="background:rgba(255,255,255,0.2)">Preselección</a>
+                    <a href="miPerfil.html">Mi Perfil</a>
+                    <a href="soporteTecnico.html">Soporte</a>
+                </div>
+                <div class="user-info">
+                    <span id="userName" style="color:white"></span>
+                    <button class="logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="welcome-card">
+            <h2>Selección de Materias - Verano 2026</h2>
+            <p>Selecciona hasta <strong>2 materias</strong> para cursar en el periodo de verano.</p>
+        </div>
+
+        <div id="alertWarning" class="alert alert-warning" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i> <span></span>
+        </div>
+        <div id="alertSuccess" class="alert alert-success" style="display: none;">
+            <i class="fas fa-check-circle"></i> <span></span>
+        </div>
+        <div id="alertError" class="alert alert-error" style="display: none;">
+            <i class="fas fa-times-circle"></i> <span></span>
+        </div>
+
+        <div class="preselecciones-card" style="margin-bottom: 2rem;">
+            <h3><i class="fas fa-list-check"></i> Tus materias seleccionadas</h3>
+            <div id="seleccionadasList" class="seleccionadas-list">
+                <p class="empty-preseleccion">No has seleccionado ninguna materia</p>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                <button id="guardarBtn" class="btn-primary" disabled><i class="fas fa-save"></i> Guardar Preselección</button>
+                <button id="cancelarBtn" class="btn-secondary">Cancelar cambios</button>
+            </div>
+        </div>
+
+        <div class="tabs" id="tabsContainer"></div>
+        <div id="materiasContainer" class="grid-materias"></div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col"><h4>Sistema de Preselección</h4><p>Plataforma para la preselección de cursos del periodo de verano.</p></div>
+                <div class="footer-col"><h4>Contacto</h4><ul><li><i class="fas fa-envelope"></i> soporte@preseleccion.edu</li><li><i class="fas fa-phone"></i> +58 (212) 555-1234</li></ul></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 Sistema de Preselección de Cursos</p><p>Desarrollado por <strong>Juliexis & Gabrie</strong></p></div>
+        </div>
+    </footer>
+
+    <script>
+        // =====================================================
+// VERIFICAR SI LAS PRESELECCIONES ESTÁN ABIERTAS
+// =====================================================
+async function verificarAccesoPreseleccion() {
+    try {
+        const response = await fetch('http://localhost:3000/api/preselecciones/estado');
+        const estado = await response.json();
+        
+        if (!estado.activo) {
+            // Redirigir al dashboard con mensaje
+            alert('🔒 Las preselecciones están cerradas. No puedes acceder a esta sección.');
+            window.location.href = 'estudiantes.html';
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Error al verificar estado:', error);
+        alert('⚠️ Error de conexión. No se puede acceder a la preselección.');
+        window.location.href = 'estudiantes.html';
+        return false;
+    }
+}
+
+// Ejecutar la verificación al cargar la página
+verificarAccesoPreseleccion();
+
+        const API_URL = 'http://localhost:3000/api';
+        let usuarioActual = null;
+        let todasMaterias = [];
+        let materiasSeleccionadas = [];
+        let semestreActual = 1;
+
+        async function verificarConexion() {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    statusIcon.className = 'fas fa-circle status-online';
+                    statusText.textContent = 'Conectado al servidor';
+                } else throw new Error();
+            } catch (error) {
+                statusIcon.className = 'fas fa-circle status-offline';
+                statusText.textContent = 'Modo offline';
+                mostrarAlerta('warning', '⚠️ Modo offline. No puedes hacer preselecciones.');
+            }
+        }
+
+        function mostrarAlerta(tipo, mensaje) {
+            const alertDiv = document.getElementById(`alert${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            if (alertDiv) {
+                alertDiv.querySelector('span').textContent = mensaje;
+                alertDiv.style.display = 'flex';
+                setTimeout(() => alertDiv.style.display = 'none', 4000);
+            }
+        }
+
+        function cargarUsuario() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            usuarioActual = user;
+            document.getElementById('userName').textContent = `👤 ${user.nombre}`;
+        }
+
+        async function cargarMaterias() {
+            try {
+                const response = await fetch(`${API_URL}/preselecciones/materias-con-seleccion/${usuarioActual.id}`);
+                todasMaterias = await response.json();
+                
+                materiasSeleccionadas = todasMaterias.filter(m => m.seleccionada === 1 || m.seleccionada === true);
+                actualizarUI();
+                
+                const semestres = [...new Set(todasMaterias.map(m => m.semestre))].sort();
+                const tabsContainer = document.getElementById('tabsContainer');
+                tabsContainer.innerHTML = semestres.map(sem => `<button class="tab-btn ${sem === semestreActual ? 'active' : ''}" onclick="cambiarSemestre(${sem})">${sem}° Semestre</button>`).join('');
+                
+                cambiarSemestre(semestreActual);
+            } catch (error) {
+                console.error('Error cargando materias:', error);
+                mostrarAlerta('error', 'Error al cargar las materias');
+            }
+        }
+
+        function cambiarSemestre(semestre) {
+            semestreActual = semestre;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(`${semestre}°`)) btn.classList.add('active');
+            });
+            
+            const materiasFiltradas = todasMaterias.filter(m => m.semestre === semestre);
+            const container = document.getElementById('materiasContainer');
+            container.innerHTML = materiasFiltradas.map(materia => `
+                <div class="materia-card ${materiasSeleccionadas.some(s => s.id === materia.id) ? 'seleccionada' : ''}" 
+                     onclick="toggleMateria(${materia.id})">
+                    <div class="codigo">${materia.codigo}</div>
+                    <div class="nombre">${materia.nombre}</div>
+                    <div class="uc">${materia.uc} U.C. - ${materia.semestre}° Semestre</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleMateria(materiaId) {
+            const materia = todasMaterias.find(m => m.id === materiaId);
+            const index = materiasSeleccionadas.findIndex(m => m.id === materiaId);
+            
+            if (index === -1) {
+                if (materiasSeleccionadas.length >= 2) {
+                    mostrarAlerta('warning', '⚠️ Solo puedes seleccionar máximo 2 materias');
+                    return;
+                }
+                materiasSeleccionadas.push(materia);
+                mostrarAlerta('success', `✅ "${materia.nombre}" agregada a tu selección`);
+            } else {
+                materiasSeleccionadas.splice(index, 1);
+                mostrarAlerta('success', `❌ "${materia.nombre}" eliminada de tu selección`);
+            }
+            actualizarUI();
+            cambiarSemestre(semestreActual);
+        }
+
+        function actualizarUI() {
+            const container = document.getElementById('seleccionadasList');
+            const guardarBtn = document.getElementById('guardarBtn');
+            
+            if (materiasSeleccionadas.length === 0) {
+                container.innerHTML = '<p class="empty-preseleccion">No has seleccionado ninguna materia</p>';
+                guardarBtn.disabled = true;
+                return;
+            }
+            
+            guardarBtn.disabled = false;
+            container.innerHTML = materiasSeleccionadas.map(m => `
+                <div class="preseleccion-item">
+                    <div><strong>${m.codigo}</strong> - ${m.nombre}<br><small>${m.uc} U.C. - ${m.semestre}° Semestre</small></div>
+                    <button class="btn-small btn-delete" onclick="toggleMateria(${m.id})"><i class="fas fa-trash"></i> Quitar</button>
+                </div>
+            `).join('');
+        }
+
+        async function guardarPreseleccion() {
+            const guardarBtn = document.getElementById('guardarBtn');
+            const originalText = guardarBtn.innerHTML;
+            guardarBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Guardando...';
+            guardarBtn.disabled = true;
+            
+            try {
+                const periodo = '2026-3';
+                
+                // Primero eliminar todas las preselecciones actuales del estudiante
+                const preseleccionesActuales = todasMaterias.filter(m => m.seleccionada === 1 || m.seleccionada === true);
+                for (const materia of preseleccionesActuales) {
+                    await fetch(`${API_URL}/preselecciones`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            estudiante_id: usuarioActual.id,
+                            materia_id: materia.id,
+                            periodo: periodo
+                        })
+                    });
+                }
+                
+                // Luego guardar las nuevas selecciones
+                for (const materia of materiasSeleccionadas) {
+                    await fetch(`${API_URL}/preselecciones`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            estudiante_id: usuarioActual.id,
+                            materia_id: materia.id,
+                            periodo: periodo
+                        })
+                    });
+                }
+                
+                mostrarAlerta('success', '✅ Preselección guardada exitosamente');
+                setTimeout(() => {
+                    window.location.href = 'estudiantes.html';
+                }, 1500);
+            } catch (error) {
+                console.error('Error guardando:', error);
+                mostrarAlerta('error', '❌ Error al guardar la preselección');
+                guardarBtn.innerHTML = originalText;
+                guardarBtn.disabled = false;
+            }
+        }
+
+        function cancelarCambios() {
+            location.reload();
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('guardarBtn').addEventListener('click', guardarPreseleccion);
+        document.getElementById('cancelarBtn').addEventListener('click', cancelarCambios);
+
+        cargarUsuario();
+        verificarConexion();
+        cargarMaterias();
+    </script>
+</body>
+</html>
