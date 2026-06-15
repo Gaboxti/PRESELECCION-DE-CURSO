@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>miPerfil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="parallax-bg"></div>
+    <div class="overlay"></div>
+
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="logo-text">
+                    <h1>Preselección de Cursos</h1>
+                    <p>Mi Perfil</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div class="status-indicator" id="statusIndicator">
+                    <i class="fas fa-circle" id="statusIcon"></i>
+                    <span id="statusText">Verificando...</span>
+                </div>
+                <div class="nav-links">
+                    <a href="estudiantes.html">Inicio</a>
+                    <a href="preseleccion.html">Preselección</a>
+                    <a href="miPerfil.html" style="background:rgba(255,255,255,0.2)">Mi Perfil</a>
+                    <a href="soporteTecnico.html">Reportes</a>
+                </div>
+                <div class="user-info">
+                    <span id="userName" style="color:white"></span>
+                    <button class="logout-btn" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="perfil-container">
+            <!-- Alertas -->
+            <div id="alertSuccess" class="alert alert-success"><i class="fas fa-check-circle"></i> <span></span></div>
+            <div id="alertError" class="alert alert-error"><i class="fas fa-times-circle"></i> <span></span></div>
+            <div id="alertWarning" class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> <span></span></div>
+
+            <!-- Modo offline warning -->
+            <div id="offlineWarning" class="sincronizacion-info" style="display: none;">
+                <i class="fas fa-wifi"></i>
+                <span>⚠️ Estás en modo offline. Los cambios se guardarán localmente y se sincronizarán cuando haya conexión.</span>
+            </div>
+
+            <!-- Tarjeta de perfil -->
+            <div class="perfil-card">
+                <div class="perfil-header">
+                    <div class="perfil-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <h2 id="perfilNombre">Cargando...</h2>
+                    <p id="perfilCarnet">Cargando...</p>
+                </div>
+
+                <!-- Información actual -->
+                <div class="info-grid">
+                    <div class="info-field">
+                        <span class="info-label"><i class="fas fa-id-card"></i> CARNET</span>
+                        <div class="info-value" id="displayCarnet">-</div>
+                        <div class="campo-bloqueado"><i class="fas fa-lock"></i> No editable</div>
+                    </div>
+                    <div class="info-field">
+                        <span class="info-label"><i class="fas fa-user"></i> NOMBRE COMPLETO</span>
+                        <div class="info-value" id="displayNombre">-</div>
+                        <div class="campo-bloqueado"><i class="fas fa-lock"></i> No editable</div>
+                    </div>
+                    <div class="info-field">
+                        <span class="info-label"><i class="fas fa-envelope"></i> CORREO ELECTRÓNICO</span>
+                        <div class="info-value" id="displayEmail">-</div>
+                    </div>
+                    <div class="info-field">
+                        <span class="info-label"><i class="fas fa-phone"></i> TELÉFONO</span>
+                        <div class="info-value" id="displayTelefono">-</div>
+                    </div>
+                    <div class="info-field">
+                        <span class="info-label"><i class="fas fa-calendar"></i> EDAD</span>
+                        <div class="info-value" id="displayEdad">-</div>
+                    </div>
+                    <div class="info-field">
+                        <span class="info-label"><i class="fas fa-layer-group"></i> SEMESTRE</span>
+                        <div class="info-value" id="displaySemestre">-</div>
+                    </div>
+                </div>
+
+                <!-- Formulario de edición -->
+                <div class="edit-form">
+                    <h3><i class="fas fa-edit"></i> Editar información</h3>
+                    
+                    <form id="editPerfilForm">
+                        <div class="form-group-edit">
+                            <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                            <input type="email" id="editEmail" placeholder="correo@ejemplo.com">
+                        </div>
+                        
+                        <div class="form-row-edit">
+                            <div class="form-group-edit">
+                                <label><i class="fas fa-phone"></i> Teléfono</label>
+                                <input type="text" id="editTelefono" placeholder="0412-1234567">
+                            </div>
+                            <div class="form-group-edit">
+                                <label><i class="fas fa-calendar"></i> Edad</label>
+                                <input type="number" id="editEdad" placeholder="20" min="16" max="100">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group-edit">
+                            <label><i class="fas fa-layer-group"></i> Semestre</label>
+                            <select id="editSemestre">
+                                <option value="1">1er Semestre</option>
+                                <option value="2">2do Semestre</option>
+                                <option value="3">3er Semestre</option>
+                                <option value="4">4to Semestre</option>
+                                <option value="5">5to Semestre</option>
+                                <option value="6">6to Semestre</option>
+                                <option value="7">7mo Semestre</option>
+                                <option value="8">8vo Semestre</option>
+                                <option value="9">9no Semestre</option>
+                                <option value="10">10mo Semestre</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-edit">
+                            <label><i class="fas fa-key"></i> Nueva Contraseña (opcional)</label>
+                            <input type="password" id="editPassword" placeholder="Dejar vacío para no cambiar">
+                        </div>
+
+                        <div class="accion-buttons">
+                            <button type="submit" class="btn-guardar"><i class="fas fa-save"></i> Guardar Cambios</button>
+                            <button type="button" class="btn-cancelar" onclick="resetFormulario()"><i class="fas fa-undo"></i> Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Transparente -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Sistema de Preselección</h4>
+                    <p>Plataforma diseñada para facilitar la preselección de cursos del periodo de verano, optimizando la planificación académica.</p>
+                    <div class="social-icons">
+                        <a href="maintenance.html?funcion=Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="maintenance.html?funcion=Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="maintenance.html?funcion=Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="maintenance.html?funcion=LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul>
+                        <li><a href="maintenance.html?funcion=Acerca%20del%20Sistema">📋 Acerca del Sistema</a></li>
+                        <li><a href="maintenance.html?funcion=Preguntas%20Frecuentes">❓ Preguntas Frecuentes</a></li>
+                        <li><a href="Terminos_condiciones.html">📄 Términos y Condiciones</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> soporte@informatica.com</li>
+                        <li><i class="fas fa-phone"></i> +58 (212) 555-1234</li>
+                        <li><i class="fas fa-map-marker-alt"></i> San Juan de los Morros, Guárico</li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Horario de Atención</h4>
+                    <ul>
+                        <li><i class="far fa-clock"></i> Lun - Vie: 8:00 AM - 5:00 PM</li>
+                        <li><i class="far fa-clock"></i> Sábados: 8:00 AM - 12:00 PM</li>
+                        <li><i class="far fa-calendar-times"></i> Domingos: Cerrado</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Sistema de Preselección de Cursos - Periodo de Verano</p>
+                <p>Desarrollado por <strong>Juliexis & Gabrie</strong></p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        // =====================================================
+        // CONFIGURACIÓN
+        // =====================================================
+        const API_URL = 'http://localhost:3000/api';
+        let usuarioActual = null;
+        let conexionBD = false;
+
+        // =====================================================
+        // VERIFICAR CONEXIÓN
+        // =====================================================
+        async function verificarConexion() {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('statusText');
+            const offlineWarning = document.getElementById('offlineWarning');
+            
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(`${API_URL}/health`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    conexionBD = true;
+                    statusIcon.className = 'fas fa-circle status-online';
+                    statusText.textContent = 'Conectado al servidor';
+                    offlineWarning.style.display = 'none';
+                } else {
+                    throw new Error('No responde');
+                }
+            } catch (error) {
+                conexionBD = false;
+                statusIcon.className = 'fas fa-circle status-offline';
+                statusText.textContent = 'Modo offline';
+                offlineWarning.style.display = 'flex';
+                mostrarAlerta('warning', '⚠️ Modo offline. Los cambios se guardarán localmente y se sincronizarán cuando haya conexión.');
+            }
+        }
+
+        // =====================================================
+        // MOSTRAR ALERTA
+        // =====================================================
+        function mostrarAlerta(tipo, mensaje) {
+            const alertDiv = document.getElementById(`alert${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            if (alertDiv) {
+                alertDiv.querySelector('span').textContent = mensaje;
+                alertDiv.style.display = 'flex';
+                setTimeout(() => {
+                    alertDiv.style.display = 'none';
+                }, 4000);
+            }
+        }
+
+        // =====================================================
+        // CARGAR USUARIO ACTUAL
+        // =====================================================
+        function cargarUsuario() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            usuarioActual = user;
+            
+            // Mostrar información en el header
+            document.getElementById('userName').textContent = `👤 ${user.nombre}`;
+            
+            // Mostrar información en el perfil
+            document.getElementById('perfilNombre').textContent = user.nombre;
+            document.getElementById('perfilCarnet').textContent = `Carnet: ${user.carnet}`;
+            document.getElementById('displayCarnet').textContent = user.carnet;
+            document.getElementById('displayNombre').textContent = user.nombre;
+            document.getElementById('displayEmail').textContent = user.email || 'No registrado';
+            document.getElementById('displayTelefono').textContent = user.telefono || 'No registrado';
+            document.getElementById('displayEdad').textContent = user.edad || 'No registrada';
+            document.getElementById('displaySemestre').textContent = user.semestre ? `${user.semestre}° Semestre` : 'No registrado';
+            
+            // Cargar valores en el formulario de edición
+            document.getElementById('editEmail').value = user.email || '';
+            document.getElementById('editTelefono').value = user.telefono || '';
+            document.getElementById('editEdad').value = user.edad || '';
+            if (user.semestre) {
+                document.getElementById('editSemestre').value = user.semestre;
+            }
+        }
+
+        // =====================================================
+        // ACTUALIZAR DATOS LOCALMENTE
+        // =====================================================
+        function actualizarDatosLocales(datosActualizados) {
+            // Actualizar usuario actual en memoria
+            usuarioActual = { ...usuarioActual, ...datosActualizados };
+            
+            // Actualizar localStorage
+            localStorage.setItem('user', JSON.stringify(usuarioActual));
+            
+            // Actualizar en la lista de usuarios locales
+            const usuariosLocales = JSON.parse(localStorage.getItem('usuarios_locales') || '[]');
+            const index = usuariosLocales.findIndex(u => u.carnet === usuarioActual.carnet);
+            if (index !== -1) {
+                usuariosLocales[index] = { ...usuariosLocales[index], ...datosActualizados };
+                localStorage.setItem('usuarios_locales', JSON.stringify(usuariosLocales));
+            }
+            
+            // Actualizar UI
+            document.getElementById('displayEmail').textContent = usuarioActual.email || 'No registrado';
+            document.getElementById('displayTelefono').textContent = usuarioActual.telefono || 'No registrado';
+            document.getElementById('displayEdad').textContent = usuarioActual.edad || 'No registrada';
+            document.getElementById('displaySemestre').textContent = usuarioActual.semestre ? `${usuarioActual.semestre}° Semestre` : 'No registrado';
+        }
+
+        // =====================================================
+        // ACTUALIZAR DATOS EN BD
+        // =====================================================
+        async function actualizarDatosBD(datosActualizados) {
+            if (!conexionBD) {
+                // Guardar cambio pendiente para sincronizar después
+                const pendientes = JSON.parse(localStorage.getItem('sincronizacion_pendiente') || '[]');
+                pendientes.push({
+                    tipo: 'actualizar_perfil',
+                    usuarioId: usuarioActual.id,
+                    datos: datosActualizados,
+                    timestamp: Date.now()
+                });
+                localStorage.setItem('sincronizacion_pendiente', JSON.stringify(pendientes));
+                return true;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/estudiantes/${usuarioActual.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...datosActualizados,
+                        carnet: usuarioActual.carnet,
+                        nombre: usuarioActual.nombre
+                    })
+                });
+                
+                const result = await response.json();
+                return result.success;
+            } catch (error) {
+                console.error('Error actualizando en BD:', error);
+                return false;
+            }
+        }
+
+        // =====================================================
+        // RESET FORMULARIO
+        // =====================================================
+        function resetFormulario() {
+            document.getElementById('editEmail').value = usuarioActual.email || '';
+            document.getElementById('editTelefono').value = usuarioActual.telefono || '';
+            document.getElementById('editEdad').value = usuarioActual.edad || '';
+            document.getElementById('editSemestre').value = usuarioActual.semestre || '';
+            document.getElementById('editPassword').value = '';
+            mostrarAlerta('success', 'Formulario restablecido');
+        }
+
+        // =====================================================
+        // GUARDAR CAMBIOS
+        // =====================================================
+        document.getElementById('editPerfilForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const datosActualizados = {};
+            
+            // Validar email
+            const nuevoEmail = document.getElementById('editEmail').value.trim();
+            if (nuevoEmail && nuevoEmail !== usuarioActual.email) {
+                if (!nuevoEmail.includes('@') || !nuevoEmail.includes('.')) {
+                    mostrarAlerta('error', '❌ Correo electrónico inválido');
+                    return;
+                }
+                datosActualizados.email = nuevoEmail;
+            }
+            
+            // Teléfono
+            const nuevoTelefono = document.getElementById('editTelefono').value.trim();
+            if (nuevoTelefono !== (usuarioActual.telefono || '')) {
+                datosActualizados.telefono = nuevoTelefono;
+            }
+            
+            // Edad
+            const nuevaEdad = document.getElementById('editEdad').value;
+            if (nuevaEdad && nuevaEdad !== (usuarioActual.edad || '')) {
+                if (nuevaEdad < 16 || nuevaEdad > 100) {
+                    mostrarAlerta('error', '❌ Edad inválida (debe estar entre 16 y 100)');
+                    return;
+                }
+                datosActualizados.edad = nuevaEdad;
+            }
+            
+            // Semestre
+            const nuevoSemestre = document.getElementById('editSemestre').value;
+            if (nuevoSemestre && nuevoSemestre !== (usuarioActual.semestre || '')) {
+                datosActualizados.semestre = nuevoSemestre;
+            }
+            
+            // Contraseña
+            const nuevaPassword = document.getElementById('editPassword').value;
+            if (nuevaPassword) {
+                if (nuevaPassword.length < 6) {
+                    mostrarAlerta('error', '❌ La contraseña debe tener al menos 6 caracteres');
+                    return;
+                }
+                datosActualizados.password = nuevaPassword;
+            }
+            
+            // Si no hay cambios
+            if (Object.keys(datosActualizados).length === 0) {
+                mostrarAlerta('warning', '⚠️ No hay cambios para guardar');
+                return;
+            }
+            
+            // Mostrar loading
+            const submitBtn = document.querySelector('#editPerfilForm button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Guardando...';
+            submitBtn.disabled = true;
+            
+            try {
+                // 1. Actualizar localmente (siempre)
+                actualizarDatosLocales(datosActualizados);
+                
+                // 2. Intentar actualizar en BD
+                const exitoBD = await actualizarDatosBD(datosActualizados);
+                
+                if (exitoBD) {
+                    mostrarAlerta('success', '✅ Perfil actualizado correctamente');
+                } else if (conexionBD) {
+                    mostrarAlerta('warning', '⚠️ Perfil actualizado localmente. No se pudo sincronizar con el servidor.');
+                } else {
+                    mostrarAlerta('success', '✅ Perfil actualizado localmente. Se sincronizará cuando haya conexión.');
+                }
+                
+                // Limpiar campo de contraseña
+                document.getElementById('editPassword').value = '';
+                
+            } catch (error) {
+                mostrarAlerta('error', '❌ Error al guardar los cambios');
+                console.error(error);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // =====================================================
+        // CERRAR SESIÓN
+        // =====================================================
+        function cerrarSesion() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // =====================================================
+        // INICIALIZAR
+        // =====================================================
+        cargarUsuario();
+        verificarConexion();
+        setInterval(verificarConexion, 30000);
+    </script>
+</body>
+</html>
