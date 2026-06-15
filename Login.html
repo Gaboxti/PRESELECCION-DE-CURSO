@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Preselección de Cursos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <div class="parallax-bg"></div>
+    <div class="overlay"></div>
+
+    <div id="noInternetOverlay" class="no-internet-overlay">
+        <i class="fas fa-wifi"></i>
+        <h2>Sin conexión a internet</h2>
+        <p>No tienes conexión a internet y no hay datos locales guardados en este dispositivo.</p>
+        <p style="font-size: 0.875rem;">Para usar el sistema por primera vez, necesitas conexión a internet.<br>Una vez que hayas iniciado sesión, podrás acceder sin conexión.</p>
+        <button class="retry-btn" onclick="window.location.reload()"><i class="fas fa-sync-alt"></i> Reintentar</button>
+    </div>
+
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                <div class="logo-text">
+                    <h1>Preselección de Cursos</h1>
+                    <p>Sistema de Planificación Académica</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="status-indicator" id="statusIndicator">
+                    <i class="fas fa-circle status-online"></i>
+                    <span id="statusText">Conectado al servidor</span>
+                </div>
+                <div class="header-badge"><i class="fas fa-calendar-alt"></i> Periodo de Verano 2026-3</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="card-body">
+
+                    <!-- LOGIN -->
+                    <div id="loginForm" class="auth-form active">
+                        <div class="login-header">
+                            <div class="logo-icon"><i class="fas fa-user-circle"></i></div>
+                            <h2>Bienvenido</h2>
+                            <p>Ingresa tus credenciales para acceder</p>
+                            <hr>
+                        </div>
+                        <div id="loginError" class="error-message"><i class="fas fa-exclamation-circle"></i> <span></span></div>
+                        <div id="loginSuccess" class="success-message"><i class="fas fa-check-circle"></i> <span></span></div>
+                        <div id="loginInfo" class="info-message"><i class="fas fa-info-circle"></i> <span></span></div>
+                        <div id="loginWarning" class="warning-message"><i class="fas fa-exclamation-triangle"></i> <span></span></div>
+                        <div id="captchaMessage" class="captcha-message"><i class="fas fa-shield-alt"></i> <span></span></div>
+
+                        <form id="loginFormSubmit">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Carnet o Correo Electrónico</label>
+                                <input type="text" id="loginUsername" placeholder="Ej: 12345678 o correo@ejemplo.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-lock"></i> Contraseña</label>
+                                <input type="password" id="loginPassword" placeholder="Ingresa tu contraseña" required>
+                            </div>
+                            <div class="captcha-container">
+                                <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" data-callback="onCaptchaSuccess"></div>
+                            </div>
+                            <button type="submit" id="loginBtn" class="btn-primary" disabled><i class="fas fa-arrow-right"></i> Iniciar Sesión</button>
+                        </form>
+
+                        <hr>
+
+                        <button class="tab-btn" id="registerTabBtn" onclick="switchTab('register')"><i class="fas fa-user-plus"></i> Registrarse</button>
+                        <button class="tab-btn" onclick="redirectToMaintenance('Recuperación de Contraseña')"><i class="fas fa-key"></i> ¿Olvidó su contraseña?</button>
+                    </div>
+
+                    <!-- REGISTRO -->
+                    <div id="registerForm" class="auth-form">
+                        <div class="login-header">
+                            <div class="logo-icon"><i class="fas fa-user-plus"></i></div>
+                            <h2>Crear Cuenta</h2>
+                            <p>Regístrate como estudiante</p>
+                            <hr>
+                        </div>
+                        <div id="registerError" class="error-message"><i class="fas fa-exclamation-circle"></i> <span></span></div>
+                        <div id="registerSuccess" class="success-message"><i class="fas fa-check-circle"></i> <span></span></div>
+                        <div id="registerWarning" class="warning-message"><i class="fas fa-exclamation-triangle"></i> <span></span></div>
+
+                        <form id="registerFormSubmit">
+                            <div class="form-group">
+                                <label><i class="fas fa-id-card"></i> Carnet *</label>
+                                <input type="text" id="regCarnet" placeholder="Ej: 20250001" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Nombre Completo *</label>
+                                <input type="text" id="regNombre" placeholder="Ej: Ana María García" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Correo Electrónico *</label>
+                                <input type="email" id="regEmail" placeholder="ejemplo@correo.com" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fas fa-phone"></i> Teléfono</label>
+                                    <input type="text" id="regTelefono" placeholder="0412-1234567">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-calendar"></i> Edad</label>
+                                    <input type="number" id="regEdad" placeholder="20" min="16" max="100">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-layer-group"></i> Semestre *</label>
+                                <select id="regSemestre" required>
+                                    <option value="">Selecciona</option>
+                                    <option value="1">1er Semestre</option><option value="2">2do Semestre</option>
+                                    <option value="3">3er Semestre</option><option value="4">4to Semestre</option>
+                                    <option value="5">5to Semestre</option><option value="6">6to Semestre</option>
+                                    <option value="7">7mo Semestre</option><option value="8">8vo Semestre</option>
+                                    <option value="9">9no Semestre</option><option value="10">10mo Semestre</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fas fa-key"></i> Contraseña *</label>
+                                    <input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fas fa-check"></i> Confirmar Contraseña</label>
+                                    <input type="password" id="regConfirmPassword" placeholder="Repite tu contraseña" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> Registrarse</button>
+                        </form>
+                        <hr>
+                        <button class="tab-btn" onclick="switchTab('login')"><i class="fas fa-arrow-left"></i> Volver al Inicio de Sesión</button>
+                    </div>
+
+                    <!-- RECUPERAR CONTRASEÑA -->
+                    <div id="recoverForm" class="auth-form">
+                        <div class="login-header">
+                            <div class="logo-icon"><i class="fas fa-key"></i></div>
+                            <h2>Recuperar Contraseña</h2>
+                            <p>Ingresa tu correo para recuperar tu contraseña</p>
+                            <hr>
+                        </div>
+                        <div id="recoverMessage" class="info-message"><i class="fas fa-info-circle"></i> <span></span></div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                            <input type="email" id="recoverEmail" placeholder="correo@ejemplo.com" required>
+                        </div>
+                        <button class="btn-primary" onclick="redirectToMaintenance('Recuperación de Contraseña')"><i class="fas fa-paper-plane"></i> Enviar instrucciones</button>
+                        <hr>
+                        <button class="tab-btn" onclick="switchTab('login')"><i class="fas fa-arrow-left"></i> Volver al Inicio de Sesión</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Términos -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-file-contract"></i> Términos y Condiciones</h3>
+            <div class="terms-text">
+                <h4>1. Almacenamiento Local de Datos</h4>
+                <p>Al aceptar estos términos, autorizas al Sistema de Preselección de Cursos a almacenar una copia local de tus datos personales y académicos en el dispositivo que estés utilizando.</p>
+                <h4>2. Sincronización con Servidor</h4>
+                <p>Tus datos se sincronizarán automáticamente con nuestros servidores cuando tengas conexión a internet.</p>
+                <h4>3. Limitaciones del Modo Sin Conexión</h4>
+                <ul>
+                    <li>✅ Ver tu información personal almacenada localmente</li>
+                    <li>✅ Editar tus datos personales</li>
+                    <li>✅ Consultar el catálogo de materias</li>
+                    <li>❌ NO podrás realizar nuevas preselecciones de cursos</li>
+                    <li>❌ NO podrás registrarte como nuevo usuario</li>
+                </ul>
+            </div>
+            <div class="terms-actions">
+                <button id="acceptTerms" class="btn-primary">Acepto los Términos</button>
+                <button id="declineTerms" class="btn-secondary">Rechazo</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Sistema de Preselección</h4>
+                    <p>Plataforma para la preselección de cursos del periodo de verano.</p>
+                    <div class="social-icons">
+                        <a href="maintenance.html?funcion=Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="maintenance.html?funcion=Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="maintenance.html?funcion=Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="maintenance.html?funcion=LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Enlaces Rápidos</h4>
+                    <ul>
+                        <li><a href="maintenance.html?funcion=Acerca%20del%20Sistema">📋 Acerca del Sistema</a></li>
+                        <li><a href="soporteTecnico.html">📞 Soporte Técnico</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contacto</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> soporte@preseleccion.edu</li>
+                        <li><i class="fas fa-phone"></i> +58 (212) 555-1234</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Sistema de Preselección de Cursos - Periodo de Verano</p>
+                <p>Desarrollado por <strong>Juliexis & Gabrie</strong></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let captchaValidado = false;
+        let conexionBD = true;  // FORZADO A true
+        let modoOffline = false;
+        let hayDatosLocales = false;
+        let termsAccepted = localStorage.getItem('termsAccepted') === 'true';
+
+        function verificarDatosLocales() {
+            const usuariosLocales = JSON.parse(localStorage.getItem('usuarios_locales') || '[]');
+            hayDatosLocales = usuariosLocales.length > 0;
+            return hayDatosLocales;
+        }
+
+        function redirectToMaintenance(functionName) {
+            window.location.href = `maintenance.html?funcion=${encodeURIComponent(functionName)}`;
+        }
+
+        async function sincronizarDatosLocales() {
+            const pendientes = JSON.parse(localStorage.getItem('sincronizacion_pendiente') || '[]');
+            if (pendientes.length > 0 && conexionBD) {
+                for (const item of pendientes) {
+                    try {
+                        if (item.tipo === 'actualizar_perfil') {
+                            await fetch(`${API_URL}/estudiantes/${item.usuarioId}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(item.datos)
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Error sincronizando:', e);
+                    }
+                }
+                localStorage.setItem('sincronizacion_pendiente', '[]');
+                mostrarInfo('loginInfo', '✅ Datos sincronizados');
+            }
+        }
+
+        async function loginHibrido(username, password) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    guardarUsuarioLocal(data.user);
+                    return { success: true, user: data.user, modo: 'online' };
+                } else {
+                    return { success: false, error: data.error };
+                }
+            } catch (error) {
+                console.error('Error login:', error);
+                return loginOffline(username, password);
+            }
+        }
+
+        async function loginOffline(username, password) {
+            const tieneDatos = verificarDatosLocales();
+            if (!tieneDatos) {
+                return { success: false, error: 'Conéctate a internet para acceder.', requiereInternet: true };
+            }
+            
+            const usuariosLocales = JSON.parse(localStorage.getItem('usuarios_locales') || '[]');
+            const user = usuariosLocales.find(u => (u.carnet === username || u.email === username) && u.password === password);
+            
+            if (user) {
+                return { success: true, user: { ...user, modo: 'offline' }, modo: 'offline' };
+            }
+            return { success: false, error: 'Usuario no encontrado' };
+        }
+
+        async function registerHibrido(data) {
+            if (!conexionBD) {
+                return { success: false, error: '⚠️ Sin conexión a internet. Conéctate para registrarte.' };
+            }
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return await response.json();
+            } catch (error) {
+                return { success: false, error: 'Error de conexión' };
+            }
+        }
+
+        function guardarUsuarioLocal(user) {
+            const usuariosLocales = JSON.parse(localStorage.getItem('usuarios_locales') || '[]');
+            const index = usuariosLocales.findIndex(u => u.carnet === user.carnet);
+            if (index === -1) {
+                usuariosLocales.push(user);
+            } else {
+                usuariosLocales[index] = { ...usuariosLocales[index], ...user };
+            }
+            localStorage.setItem('usuarios_locales', JSON.stringify(usuariosLocales));
+            hayDatosLocales = true;
+        }
+
+        function mostrarInfo(element, mensaje) {
+            const infoDiv = document.getElementById(element);
+            if (infoDiv) {
+                infoDiv.querySelector('span').textContent = mensaje;
+                infoDiv.style.display = 'flex';
+                setTimeout(() => infoDiv.style.display = 'none', 5000);
+            }
+        }
+
+        function mostrarWarning(element, mensaje) {
+            const warningDiv = document.getElementById(element);
+            if (warningDiv) {
+                warningDiv.querySelector('span').textContent = mensaje;
+                warningDiv.style.display = 'flex';
+                setTimeout(() => warningDiv.style.display = 'none', 8000);
+            }
+        }
+
+        function showMessage(element, message, isError = true) {
+            const msgDiv = document.getElementById(element);
+            if (!msgDiv) return;
+            msgDiv.querySelector('span').textContent = message;
+            msgDiv.style.display = 'flex';
+            setTimeout(() => msgDiv.style.display = 'none', isError ? 4000 : 3000);
+        }
+
+        window.onCaptchaSuccess = () => {
+            captchaValidado = true;
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) loginBtn.disabled = false;
+            document.getElementById('captchaMessage').style.display = 'none';
+        };
+
+        function switchTab(tab) {
+            const loginDiv = document.getElementById('loginForm');
+            const registerDiv = document.getElementById('registerForm');
+            const recoverDiv = document.getElementById('recoverForm');
+            
+            loginDiv.classList.remove('active');
+            registerDiv.classList.remove('active');
+            if (recoverDiv) recoverDiv.classList.remove('active');
+            
+            if (tab === 'login') {
+                loginDiv.classList.add('active');
+            } else if (tab === 'register') {
+                registerDiv.classList.add('active');
+            } else if (tab === 'recover' && recoverDiv) {
+                recoverDiv.classList.add('active');
+            }
+        }
+
+        function mostrarTerminos() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+
+        document.getElementById('acceptTerms').addEventListener('click', () => {
+            localStorage.setItem('termsAccepted', 'true');
+            document.getElementById('termsModal').style.display = 'none';
+            termsAccepted = true;
+        });
+
+        document.getElementById('declineTerms').addEventListener('click', () => {
+            document.getElementById('termsModal').style.display = 'none';
+            window.location.href = 'about:blank';
+        });
+
+        document.getElementById('showTermsLink')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            mostrarTerminos();
+        });
+
+        if (!termsAccepted) {
+            setTimeout(() => mostrarTerminos(), 500);
+        }
+
+        document.getElementById('loginFormSubmit').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!captchaValidado) {
+                showMessage('captchaMessage', '⚠️ Verifica que no eres un robot', true);
+                return;
+            }
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Verificando...';
+            loginBtn.disabled = true;
+            
+            try {
+                const result = await loginHibrido(username, password);
+                
+                if (result.success) {
+                    showMessage('loginSuccess', `✅ Bienvenido ${result.user.nombre}. Redirigiendo...`, false);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    setTimeout(() => window.location.href = 'estudiantes.html', 1500);
+                } else {
+                    showMessage('loginError', `❌ ${result.error}`, true);
+                    grecaptcha.reset();
+                    captchaValidado = false;
+                    loginBtn.disabled = true;
+                }
+            } catch (error) {
+                showMessage('loginError', '❌ Error inesperado', true);
+                grecaptcha.reset();
+                captchaValidado = false;
+                loginBtn.disabled = true;
+            } finally {
+                loginBtn.innerHTML = originalText;
+            }
+        });
+
+        document.getElementById('registerFormSubmit').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!conexionBD) {
+                showMessage('registerError', '❌ Sin conexión a internet. Conéctate para registrarte.', true);
+                return;
+            }
+            
+            const password = document.getElementById('regPassword').value;
+            const confirm = document.getElementById('regConfirmPassword').value;
+            
+            if (password !== confirm) {
+                showMessage('registerError', '❌ Las contraseñas no coinciden', true);
+                return;
+            }
+            if (password.length < 6) {
+                showMessage('registerError', '❌ La contraseña debe tener al menos 6 caracteres', true);
+                return;
+            }
+            
+            const data = {
+                carnet: document.getElementById('regCarnet').value.trim(),
+                nombre: document.getElementById('regNombre').value.trim(),
+                email: document.getElementById('regEmail').value.trim(),
+                telefono: document.getElementById('regTelefono').value.trim(),
+                edad: document.getElementById('regEdad').value,
+                semestre: document.getElementById('regSemestre').value,
+                password: password
+            };
+            
+            const registerBtn = document.querySelector('#registerFormSubmit button');
+            const originalText = registerBtn.innerHTML;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registrando...';
+            registerBtn.disabled = true;
+            
+            try {
+                const result = await registerHibrido(data);
+                if (result.success) {
+                    showMessage('registerSuccess', '✅ Registro exitoso. Ahora puedes iniciar sesión', false);
+                    document.getElementById('registerFormSubmit').reset();
+                    setTimeout(() => switchTab('login'), 2000);
+                } else {
+                    showMessage('registerError', `❌ ${result.error}`, true);
+                }
+            } catch (error) {
+                showMessage('registerError', '❌ Error de conexión', true);
+            } finally {
+                registerBtn.innerHTML = originalText;
+                registerBtn.disabled = false;
+            }
+        });
+
+        const parallaxBg = document.querySelector('.parallax-bg');
+        if (parallaxBg) {
+            window.addEventListener('scroll', () => {
+                parallaxBg.style.transform = `translateY(${window.scrollY * -0.15}px)`;
+            });
+        }
+
+        verificarDatosLocales();
+    </script>
+</body>
+</html>
